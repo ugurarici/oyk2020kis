@@ -11,7 +11,7 @@ class TodoItem extends Model
         if($this->completed_at) {
             $this->completed_at = null;
         } else {
-            $this->completed_at = now();
+            $this->completed_at = now()->toDateTimeString();
         }
     }
 
