@@ -16,5 +16,17 @@ Route::get('/', function () {
 });
 
 Route::get('falan', function(){
-    return "filan";
+    return App\TodoItem::all();
 });
+
+//  bütün todo listesi
+//  yeni bir todo ekleme işlemi
+//  bir todo'yu tamamlandı işaretleme
+//  bir todo'yapılmadı işaretleme
+
+Route::get('todos', 'TodoItemController@index')->name('todos.all')->middleware(['auth']);
+Route::get('todos/{todo}/togglecomplete', 'TodoItemController@toggle')->name('todos.toggle')->middleware(['auth']);
+Route::post('todos', 'TodoItemController@store')->name('todos.store')->middleware(['auth']);
+Auth::routes();
+
+Route::get('/home', 'HomeController@index')->name('home');
