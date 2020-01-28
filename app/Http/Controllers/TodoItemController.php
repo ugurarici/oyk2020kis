@@ -15,7 +15,7 @@ class TodoItemController extends Controller
 
     public function toggle(TodoItem $todo, Request $request)
     {
-        if($request->user()->id !== $todo->user_id) return abort(403);
+        if($request->user()->id != $todo->user_id) return abort(403);
         $todo->toggle();
         $todo->save();
         return redirect()->route('todos.all');

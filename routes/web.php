@@ -11,6 +11,8 @@
 |
 */
 
+Route::view('vuetest', 'vuetest');
+
 Route::get('/', function () {
     return view('welcome');
 });

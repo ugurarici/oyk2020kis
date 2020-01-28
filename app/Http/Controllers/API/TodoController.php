@@ -30,6 +30,7 @@ class TodoController extends Controller
         $todo = new TodoItem;
         $todo->user_id = $request->user()->id;
         $todo->text = $request->todo;
+        $todo->completed_at = null;
         $todo->save();
         return $todo;
     }
