@@ -1,21 +1,33 @@
 <template>
   <div>
-    <form @submit.prevent="addNewTodo">
-      <input type="text" v-model="newtodo" :disabled="isAddingNew" />
-      <button type="submit" :disabled="isAddingNew">Ekle</button>
-    </form>
-    <ul>
-      <li
-        v-for="todo in todos"
-        :key="todo.id"
-        @click="toggle(todo.id)"
-        :class="{'completed': todo.completed_at}"
-      >
-        <span v-if="todo.completed_at">✅</span>
-        <span v-else>⭕️</span>
-        {{todo.text}}
-      </li>
-    </ul>
+    <div id="login" v-if="!token">
+      <form @submit.prevent="login">
+        E-Posta:
+        <input type="email" v-model="login_email" />
+        <br />Parola:
+        <input type="password" v-model="login_password" />
+        <br />
+        <button type="submit">Giriş Yap</button>
+      </form>
+    </div>
+    <div id="todos" v-else>
+      <form @submit.prevent="addNewTodo">
+        <input type="text" v-model="newtodo" :disabled="isAddingNew" />
+        <button type="submit" :disabled="isAddingNew">Ekle</button>
+      </form>
+      <ul>
+        <li
+          v-for="todo in todos"
+          :key="todo.id"
+          @click="toggle(todo.id)"
+          :class="{'completed': todo.completed_at}"
+        >
+          <span v-if="todo.completed_at">✅</span>
+          <span v-else>⭕️</span>
+          {{todo.text}}
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
@@ -25,10 +37,27 @@ export default {
     return {
       newtodo: "",
       todos: [],
-      isAddingNew: false
+      isAddingNew: false,
+      login_email: null,
+      login_password: null,
+      token: null
     };
   },
   methods: {
+    login() {
+      axios
+        .post("http://oyk2020.kis/api/auth/login", {
+          email: this.login_email,
+          password: this.login_password
+        })
+        .then(response => {
+          this.token = response.data.access_token;
+          axios.defaults.headers.common["Authorization"] =
+            "Bearer " + this.token;
+          this.fetchTodos();
+        })
+        .catch(response => console.error(response));
+    },
     toggle(id) {
       const todoIndex = this.todos.findIndex(item => item.id == id);
       if (todoIndex == -1) return false;
@@ -71,11 +100,7 @@ export default {
         });
     }
   },
-  beforeMount() {
-    axios.defaults.headers.common["Authorization"] =
-      "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9veWsyMDIwLmtpc1wvYXBpXC9hdXRoXC9sb2dpbiIsImlhdCI6MTU4MDExNTM0OCwibmJmIjoxNTgwMTE1MzQ4LCJqdGkiOiJ4M2RmYU1pbXZBdXZSQnFyIiwic3ViIjoxLCJwcnYiOiI4N2UwYWYxZWY5ZmQxNTgxMmZkZWM5NzE1M2ExNGUwYjA0NzU0NmFhIn0.UKP_5ZiPoAESss2w28-eYavIQRmX9KjcRZdNRcbuPu0";
-    this.fetchTodos();
-  }
+  beforeMount() {}
 };
 </script>
 

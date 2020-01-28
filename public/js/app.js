@@ -1929,59 +1929,86 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   data: function data() {
     return {
       newtodo: "",
       todos: [],
-      isAddingNew: false
+      isAddingNew: false,
+      login_email: null,
+      login_password: null,
+      token: null
     };
   },
   methods: {
-    toggle: function toggle(id) {
+    login: function login() {
       var _this = this;
+
+      axios.post("http://oyk2020.kis/api/auth/login", {
+        email: this.login_email,
+        password: this.login_password
+      }).then(function (response) {
+        _this.token = response.data.access_token;
+        axios.defaults.headers.common["Authorization"] = "Bearer " + _this.token;
+
+        _this.fetchTodos();
+      })["catch"](function (response) {
+        return console.error(response);
+      });
+    },
+    toggle: function toggle(id) {
+      var _this2 = this;
 
       var todoIndex = this.todos.findIndex(function (item) {
         return item.id == id;
       });
       if (todoIndex == -1) return false;
       axios.put("http://oyk2020.kis/api/todos/".concat(id, "/toggle")).then(function (response) {
-        _this.todos[todoIndex].completed_at = response.data.completed_at;
+        _this2.todos[todoIndex].completed_at = response.data.completed_at;
       })["catch"](function (response) {
         console.error(response);
       });
     },
     fetchTodos: function fetchTodos() {
-      var _this2 = this;
+      var _this3 = this;
 
       axios.get("http://oyk2020.kis/api/todos").then(function (response) {
-        _this2.todos = response.data;
+        _this3.todos = response.data;
       })["catch"](function (response) {
         console.error(response);
       });
     },
     addNewTodo: function addNewTodo() {
-      var _this3 = this;
+      var _this4 = this;
 
       if (this.newtodo.length < 3) return false;
       this.isAddingNew = true;
       axios.post("http://oyk2020.kis/api/todos", {
         todo: this.newtodo
       }).then(function (response) {
-        _this3.todos.unshift(response.data);
+        _this4.todos.unshift(response.data);
 
-        _this3.newtodo = "";
+        _this4.newtodo = "";
       })["catch"](function (response) {
         console.error(response);
       }).then(function () {
-        _this3.isAddingNew = false;
+        _this4.isAddingNew = false;
       });
     }
   },
-  beforeMount: function beforeMount() {
-    axios.defaults.headers.common["Authorization"] = "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9veWsyMDIwLmtpc1wvYXBpXC9hdXRoXC9sb2dpbiIsImlhdCI6MTU4MDExNTM0OCwibmJmIjoxNTgwMTE1MzQ4LCJqdGkiOiJ4M2RmYU1pbXZBdXZSQnFyIiwic3ViIjoxLCJwcnYiOiI4N2UwYWYxZWY5ZmQxNTgxMmZkZWM5NzE1M2ExNGUwYjA0NzU0NmFhIn0.UKP_5ZiPoAESss2w28-eYavIQRmX9KjcRZdNRcbuPu0";
-    this.fetchTodos();
-  }
+  beforeMount: function beforeMount() {}
 });
 
 /***/ }),
@@ -38002,68 +38029,136 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c("div", [
-    _c(
-      "form",
-      {
-        on: {
-          submit: function($event) {
-            $event.preventDefault()
-            return _vm.addNewTodo($event)
-          }
-        }
-      },
-      [
-        _c("input", {
-          directives: [
+    !_vm.token
+      ? _c("div", { attrs: { id: "login" } }, [
+          _c(
+            "form",
             {
-              name: "model",
-              rawName: "v-model",
-              value: _vm.newtodo,
-              expression: "newtodo"
-            }
-          ],
-          attrs: { type: "text", disabled: _vm.isAddingNew },
-          domProps: { value: _vm.newtodo },
-          on: {
-            input: function($event) {
-              if ($event.target.composing) {
-                return
+              on: {
+                submit: function($event) {
+                  $event.preventDefault()
+                  return _vm.login($event)
+                }
               }
-              _vm.newtodo = $event.target.value
-            }
-          }
-        }),
-        _vm._v(" "),
-        _c("button", { attrs: { type: "submit", disabled: _vm.isAddingNew } }, [
-          _vm._v("Ekle")
+            },
+            [
+              _vm._v("\n      E-Posta:\n      "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.login_email,
+                    expression: "login_email"
+                  }
+                ],
+                attrs: { type: "email" },
+                domProps: { value: _vm.login_email },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.login_email = $event.target.value
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _c("br"),
+              _vm._v("Parola:\n      "),
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.login_password,
+                    expression: "login_password"
+                  }
+                ],
+                attrs: { type: "password" },
+                domProps: { value: _vm.login_password },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.login_password = $event.target.value
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _c("br"),
+              _vm._v(" "),
+              _c("button", { attrs: { type: "submit" } }, [_vm._v("Giriş Yap")])
+            ]
+          )
         ])
-      ]
-    ),
-    _vm._v(" "),
-    _c(
-      "ul",
-      _vm._l(_vm.todos, function(todo) {
-        return _c(
-          "li",
-          {
-            key: todo.id,
-            class: { completed: todo.completed_at },
-            on: {
-              click: function($event) {
-                return _vm.toggle(todo.id)
+      : _c("div", { attrs: { id: "todos" } }, [
+          _c(
+            "form",
+            {
+              on: {
+                submit: function($event) {
+                  $event.preventDefault()
+                  return _vm.addNewTodo($event)
+                }
               }
-            }
-          },
-          [
-            todo.completed_at
-              ? _c("span", [_vm._v("✅")])
-              : _c("span", [_vm._v("⭕️")]),
-            _vm._v("\n      " + _vm._s(todo.text) + "\n    ")
-          ]
-        )
-      }),
-      0
-    )
+            },
+            [
+              _c("input", {
+                directives: [
+                  {
+                    name: "model",
+                    rawName: "v-model",
+                    value: _vm.newtodo,
+                    expression: "newtodo"
+                  }
+                ],
+                attrs: { type: "text", disabled: _vm.isAddingNew },
+                domProps: { value: _vm.newtodo },
+                on: {
+                  input: function($event) {
+                    if ($event.target.composing) {
+                      return
+                    }
+                    _vm.newtodo = $event.target.value
+                  }
+                }
+              }),
+              _vm._v(" "),
+              _c(
+                "button",
+                { attrs: { type: "submit", disabled: _vm.isAddingNew } },
+                [_vm._v("Ekle")]
+              )
+            ]
+          ),
+          _vm._v(" "),
+          _c(
+            "ul",
+            _vm._l(_vm.todos, function(todo) {
+              return _c(
+                "li",
+                {
+                  key: todo.id,
+                  class: { completed: todo.completed_at },
+                  on: {
+                    click: function($event) {
+                      return _vm.toggle(todo.id)
+                    }
+                  }
+                },
+                [
+                  todo.completed_at
+                    ? _c("span", [_vm._v("✅")])
+                    : _c("span", [_vm._v("⭕️")]),
+                  _vm._v("\n        " + _vm._s(todo.text) + "\n      ")
+                ]
+              )
+            }),
+            0
+          )
+        ])
   ])
 }
 var staticRenderFns = []
