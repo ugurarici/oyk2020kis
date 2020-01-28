@@ -1,9 +1,10 @@
 <template>
   <div>
-    <login-page v-if="!token" @token-received="setToken"></login-page>
+    <login-page v-if="!token"></login-page>
     <todo-list v-else></todo-list>
   </div>
 </template>
+
 <script>
 import LoginPage from "./components/Login.vue";
 import TodoList from "./components/TodoList.vue";
@@ -12,15 +13,9 @@ export default {
     "login-page": LoginPage,
     "todo-list": TodoList
   },
-  data() {
-    return {
-      token: null
-    };
-  },
-  methods: {
-    setToken(token) {
-      this.token = token;
-      axios.defaults.headers.common["Authorization"] = "Bearer " + this.token;
+  computed: {
+    token() {
+      return this.$store.state.token;
     }
   }
 };

@@ -27,7 +27,7 @@ export default {
           password: this.login_password
         })
         .then(response => {
-          this.$emit("token-received", response.data.access_token);
+          this.$store.commit("setToken", response.data.access_token);
         })
         .catch(response => console.error(response));
     }
