@@ -23,6 +23,15 @@ window.axios = require('axios');
 
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
+import store from './store';
+
+axios.interceptors.request.use(config => {
+    if (store.state.token) {
+        config.headers["Authorization"] = "Bearer " + store.state.token;
+    }
+    return config;
+});
+
 /**
  * Echo exposes an expressive API for subscribing to channels and listening
  * for events that are broadcast by Laravel. Echo and event broadcasting
